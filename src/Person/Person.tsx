@@ -1,6 +1,7 @@
 import React from 'react';
 import './Person.css';
-type Person = {
+
+interface Person  {
     name: string;
     age: number;
     children?: string;

@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import './App.css';
 import Person from './Person/Person';
 
-class App extends Component {
+class App extends React.Component {
     state = {
       persons : [
       {name:'Max', age:28},
@@ -20,11 +20,11 @@ class App extends Component {
           ]
       });
     }
-    nameChangeHandler = (event:any) => {
+    nameChangeHandler = (e: React.FormEvent<HTMLInputElement>)=> {
       this.setState( {persons: 
         [
           {name: 'Maxi' , age:28},
-          {name: event.target.value, age:89},
+          {name: e.currentTarget.value, age:89},
           {name:'Mani', age:5}
           ]
       });
