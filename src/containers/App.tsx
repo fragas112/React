@@ -3,6 +3,9 @@ import classes from './App.module.css';
 import Person from '../Components/Persons/Person/Person';
 import Cockpit from '../Components/Cockpit/Cockpit';
 import Persons from '../Components/Persons/Persons';
+import withClass from '../hoc/withClass';
+import Aux from '../hoc/Auxilary'
+import AuthContext from '../context/auth-context'
 
 // const StyledButton = styled.button<{alt:boolean}>`
 //   background-color: ${props => props.alt ? 'red':'green'};
@@ -21,10 +24,7 @@ interface Props {
   appTitle:string;
 }
 class App extends React.Component<Props> {
- constructor(props: Readonly<Props>) {
-   super(props);
-   console.log('[App.tsx] constructor');
- }
+
     state = {
       persons : [
       {id: '1', name:'Max', age:28},
@@ -32,17 +32,15 @@ class App extends React.Component<Props> {
       {id: '3', name:'Mani', age:30}
       ], 
       showPersons: false,
-      showCockpit: true
+      showCockpit: true,
+      changeCounter:0,
+      authenticated:false
     };
 
     static getDerivedStateFromProps(props:string, state:string) {
       console.log('[App.tsx] getDerivedStateFromProps', props);
       return state;
     }
-    // componentWillMount () {
-    //   console.log('[App.tsx] componentWillMount');
-    // }
-
     componentDidMount() {
       console.log('[App.tsx] componentDidMount');
     }
@@ -69,17 +67,21 @@ class App extends React.Component<Props> {
       const persons=[...this.state.persons];
       persons[personIndex]= person;
 
-      this.setState( {persons:         [
-          {name: 'Maxi' , age:28},
-          {name: event.currentTarget.value, age:89},
-          {name:'Mani', age:5}
-          ]
+      this.setState(() => {
+        return {
+        persons:persons, 
+        changeCounter:this.state.changeCounter + 1
+        };
       });
     }
     togglePersonsHandler = ():void => {
       const doesShow = this.state.showPersons;
       this.setState({showPersons: !doesShow});
     }
+    loginHandler= () => {
+      this.setState({authenticated: true});
+    }
+
     render(){
       console.log('[App.tsx] render');
       const appTitle = {
@@ -92,12 +94,18 @@ class App extends React.Component<Props> {
         persons = <Persons 
           persons={this.state.persons}
           clicked={this.deletePersonHandler}
-          changed={this.nameChangeHandler}/>;
+          changed={this.nameChangeHandler}
+          isAuthenticated={this.state.authenticated}
+          />;
       }
 
     return (
-      <div className={classes.App}>
+      <Aux classes={classes.App}>
         <button onClick={()=> {this.setState({showCockpit: false})}}>Remove Cockpit</button>
+        <AuthContext.Provider value={{
+            authenticated: this.state.authenticated,
+            login: this.loginHandler
+            }}>
         {this.state.showCockpit ? <Cockpit 
           title={this.props.appTitle}
           showPersons={this.state.showPersons}
@@ -105,12 +113,11 @@ class App extends React.Component<Props> {
           clicked={this.togglePersonsHandler}/>
         :null}
       {persons} 
-      </div>
+      </AuthContext.Provider>
+      </Aux>
 
     );
   }
 }
-
-
-export default App;
+export default withClass(App,classes.App);
  
